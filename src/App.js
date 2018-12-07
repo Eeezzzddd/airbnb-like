@@ -3,14 +3,16 @@ import "./App.css";
 import {
   ReactiveBase,
   CategorySearch,
-  ResultCard,
-  SingleRange
+  ResultCard
 } from "@appbaseio/reactivesearch";
+
+import { ReactiveMap } from "@appbaseio/reactivemaps";
 
 class App extends Component {
   render() {
     return (
       <div className="App">
+        {/* Base for reactive search */}
         <ReactiveBase
           app="Chocos2"
           credentials="f9zaMBDZ0:9cacf8eb-98fb-40ff-a10b-e82c2574bc08"
@@ -20,48 +22,48 @@ class App extends Component {
             dataField="name"
             categoryField="property_type.raw"
             placeholder="Search for a room"
+
           />
           <div className="MainView">
-          <div className="Filters">
-            <SingleRange
-              componentId="ratingsfilter"
-              title="Filter by ratings"
-              dataField="rating"
-              data={[
-                { start: "4", end: "5", label: "4 stars and up" },
-                { start: "3", end: "5", label: "3 stars and up" },
-                { start: "2", end: "5", label: "2 stars and up" },
-                { start: "1", end: "5", label: "see all ratings" }
-              ]}
-              defaultSelected="4 stars and up"
+            {/* Cards of all accomodations */}
+            <ResultCard
+              componentId="results"
+              dataField="name"
+              size={50}
+              pagination={true}
+              react={{
+                and: ["searchbox"]
+              }}
+              onData={res => {
+                return {
+                  image: res.image,
+                  title: res.room_type,
+                  description: res.name
+                };
+              }}
               style={{
-                padding: "5px",
-                marginTop: "10px"
+                width: "50%",
+                textAlign: "center"
               }}
             />
-          </div>
 
-          <ResultCard
-            componentId="results"
-            dataField="name"
-            size={50}
-            pagination={true}
-            react={{
-              and: ["searchbox"]
-            }}
-            onData={res => {
-              return {
-                image: res.image,
-                title: res.room_type,
-                description: res.name
-              };
-            }}
-            style={{
-              width: "60%",
-              textAlign: "center"
-            }}
-
-          />
+            {/* Map displaying the accomodations */}
+            <ReactiveMap
+              componentId="map"
+              dataField="location"
+              react={{
+                and: "places"
+              }}
+              onData={result => ({
+                label: result.price+"$"
+              })}
+              style={{
+                position:"sticky",
+                left:0,
+                top:0,
+                height:"90vh"
+              }}
+            />
           </div>
         </ReactiveBase>
       </div>
